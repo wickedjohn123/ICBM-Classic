@@ -46,7 +46,14 @@ public class TileLauncherScreen extends TileLauncherPrefab implements IBlockActi
 
     public TileLauncherScreen()
     {
-        setEnergyHandler(new EnergyStorageHandler(getEnergyCapacity(null), getEnergyCapacity(null) / 50));
+        setEnergyHandler(new EnergyStorageHandler(Long.MAX_VALUE));
+    }
+
+    @Override
+    public void initiate()
+    {
+        super.initiate();
+        this.getEnergyHandler().setCapacity(this.getLaunchCost() * 2);
     }
 
     @Override
@@ -175,21 +182,13 @@ public class TileLauncherScreen extends TileLauncherPrefab implements IBlockActi
     @Override
     public boolean canLaunch()
     {
-        if (this.laucherBase != null)
+        if (this.laucherBase != null && this.laucherBase.missile != null)
         {
-            if (this.laucherBase.missile != null)
+            if (this.getEnergyHandler().extractEnergy(getLaunchCost(), false) >= getLaunchCost())
             {
-                if (this.getEnergyHandler().isFull())
-                {
-                    if (this.laucherBase.isInRange(this.targetPos))
-                    {
-                        return true;
-                    }
-
-                }
+                return this.laucherBase.isInRange(this.targetPos);
             }
         }
-
         return false;
     }
 
@@ -199,7 +198,7 @@ public class TileLauncherScreen extends TileLauncherPrefab implements IBlockActi
     {
         if (this.canLaunch())
         {
-            this.getEnergyHandler().setEnergy(0);
+            this.getEnergyHandler().extractEnergy(getLaunchCost(), true);
             this.laucherBase.launchMissile(this.targetPos.clone(), this.gaoDu);
         }
     }
@@ -299,8 +298,7 @@ public class TileLauncherScreen extends TileLauncherPrefab implements IBlockActi
         this.fangXiang = (byte) facingDirection.ordinal();
     }
 
-    @Override
-    public long getEnergyCapacity(ForgeDirection from)
+    public long getLaunchCost()
     {
         switch (this.getTier())
         {

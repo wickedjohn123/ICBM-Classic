@@ -6,12 +6,14 @@ import icbm.TabICBM;
 import icbm.core.ICBMCore;
 import icbm.sentry.interfaces.IKillCount;
 import icbm.sentry.platform.BlockTurretPlatform;
-import icbm.sentry.platform.gui.user.TerminalAccessCMD;
+import icbm.sentry.platform.cmd.CMDAccessSettings;
+import icbm.sentry.platform.cmd.CommandSentry;
 import icbm.sentry.turret.EntityMountableDummy;
 import icbm.sentry.turret.TurretRegistry;
 import icbm.sentry.turret.TurretType;
 import icbm.sentry.turret.ai.TurretEntitySelector;
 import icbm.sentry.turret.auto.TurretAntiAir;
+import icbm.sentry.turret.auto.TurretAutoBow;
 import icbm.sentry.turret.auto.TurretGun;
 import icbm.sentry.turret.auto.TurretLaser;
 import icbm.sentry.turret.block.BlockTurret;
@@ -105,7 +107,7 @@ public class ICBMSentry
         //TurretEntitySelector.configTurretTargeting(); //Removed as @Config
 
         proxy.preInit();
-        CommandRegistry.register(new TerminalAccessCMD(), "admin");
+        CommandRegistry.register(new CMDAccessSettings(), "admin");
     }
 
     @EventHandler
@@ -120,6 +122,7 @@ public class ICBMSentry
         // Shell
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(itemAmmo, 16, 0), new Object[] { "T", "T", 'T', "ingotTin" }));
         // Bullets
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(itemAmmo, 16, 1), new Object[] { "SBS", "SGS", "SSS", 'B', "ingotLead", 'G', Item.gunpowder, 'S', bulletShell.copy() }));
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(itemAmmo, 16, 1), new Object[] { "SBS", "SGS", "SSS", 'B', Item.ingotIron, 'G', Item.gunpowder, 'S', bulletShell.copy() }));
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(itemAmmo, 2, 2), new Object[] { "D", "B", "B", 'D', Item.diamond, 'B', conventionalBullet }));
         GameRegistry.addRecipe(new ShapedOreRecipe(antimatterBullet, new Object[] { "A", "B", 'A', "antimatterGram", 'B', railgunBullet }));
@@ -130,11 +133,13 @@ public class ICBMSentry
         // Gun Turret
         GameRegistry.addRecipe(new ShapedOreRecipe(TurretRegistry.getItemStack(TurretGun.class), new Object[] { "SSS", "CS ", 'C', UniversalRecipe.CIRCUIT_T2.get(), 'S', UniversalRecipe.PRIMARY_METAL.get() }));
         // Railgun
-        GameRegistry.addRecipe(new ShapedOreRecipe(TurretRegistry.getItemStack(MountedRailgun.class), new Object[] { "DDD", "CS ", " S ", 'D', Block.blockDiamond, 'S', UniversalRecipe.PRIMARY_PLATE.get(), 'C', UniversalRecipe.CIRCUIT_T3.get(), /*'G', new ItemStack(blockTurret, 1, 0) */ }));
+        GameRegistry.addRecipe(new ShapedOreRecipe(TurretRegistry.getItemStack(MountedRailgun.class), new Object[] { "DDD", "CS ", " S ", 'D', Block.blockDiamond, 'S', UniversalRecipe.PRIMARY_PLATE.get(), 'C', UniversalRecipe.CIRCUIT_T3.get(), /*'G', new ItemStack(blockTurret, 1, 0) */}));
         // AA Turret
-        GameRegistry.addRecipe(new ShapedOreRecipe(TurretRegistry.getItemStack(TurretAntiAir.class), new Object[] { "DDS", "CS ", " S ", 'D', UniversalRecipe.SECONDARY_PLATE.get(), 'S', UniversalRecipe.PRIMARY_PLATE.get(), 'C', UniversalRecipe.CIRCUIT_T3.get(), /*'G', new ItemStack(blockTurret, 1, 0) */ }));
+        GameRegistry.addRecipe(new ShapedOreRecipe(TurretRegistry.getItemStack(TurretAntiAir.class), new Object[] { "DDS", "CS ", " S ", 'D', UniversalRecipe.SECONDARY_PLATE.get(), 'S', UniversalRecipe.PRIMARY_PLATE.get(), 'C', UniversalRecipe.CIRCUIT_T3.get(), /*'G', new ItemStack(blockTurret, 1, 0) */}));
         // Laser Turret
         GameRegistry.addRecipe(new ShapedOreRecipe(TurretRegistry.getItemStack(TurretLaser.class), new Object[] { "DDG", "CS ", "GS ", 'D', UniversalRecipe.SECONDARY_PLATE.get(), 'S', UniversalRecipe.PRIMARY_PLATE.get(), 'C', UniversalRecipe.CIRCUIT_T3.get(), 'D', Item.diamond, 'G', Block.glass }));
+        // Crossbox sentry
+        GameRegistry.addRecipe(new ShapedOreRecipe(TurretRegistry.getItemStack(TurretAutoBow.class), new Object[] { "BCL", "DW ", "WW ", 'D', Block.dispenser, 'B', Item.bow, 'C', UniversalRecipe.CIRCUIT_T1.get(), 'W', Block.planks}));
 
         // Upgrades
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(itemUpgrade, 1, Upgrades.RANGE.ordinal()), new Object[] { "B", "I", 'B', Item.bow, 'I', Item.diamond }));
