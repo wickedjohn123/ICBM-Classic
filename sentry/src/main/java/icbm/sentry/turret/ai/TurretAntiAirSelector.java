@@ -3,7 +3,7 @@ package icbm.sentry.turret.ai;
 import icbm.sentry.interfaces.ITurret;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import calclavia.api.icbm.IMissile;
+import resonant.api.explosion.IMissile;
 
 /** Anti-Air target selection for the AA gun. Does some extended checking of flying targets to
  * prevent issues.
@@ -14,7 +14,7 @@ public class TurretAntiAirSelector extends TurretEntitySelector
     public TurretAntiAirSelector(ITurret turret)
     {
         super(turret);
-        this.targetting.put("missiles", true);
+        this.targetting.add("missiles");
     }
 
     @Override

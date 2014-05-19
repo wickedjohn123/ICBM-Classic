@@ -1,15 +1,15 @@
-package icbm.sentry.turret.weapon.types;
+package icbm.sentry.weapon.types;
 
 import icbm.Reference;
 import icbm.sentry.ICBMSentry;
 import icbm.sentry.interfaces.IEnergyWeapon;
 import icbm.sentry.interfaces.ITurret;
-import icbm.sentry.turret.weapon.WeaponDamage;
+import icbm.sentry.weapon.WeaponDamage;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import resonant.lib.prefab.damage.ObjectDamageSource;
 import universalelectricity.api.CompatibilityModule;
 import universalelectricity.api.vector.IVector3;
-import calclavia.lib.prefab.damage.ObjectDamageSource;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 

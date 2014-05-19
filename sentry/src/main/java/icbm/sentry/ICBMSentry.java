@@ -7,11 +7,11 @@ import icbm.core.ICBMCore;
 import icbm.sentry.interfaces.IKillCount;
 import icbm.sentry.platform.BlockTurretPlatform;
 import icbm.sentry.platform.cmd.CMDAccessSettings;
+import icbm.sentry.platform.cmd.CMDSentryTargetting;
 import icbm.sentry.platform.cmd.CommandSentry;
 import icbm.sentry.turret.EntityMountableDummy;
 import icbm.sentry.turret.TurretRegistry;
 import icbm.sentry.turret.TurretType;
-import icbm.sentry.turret.ai.TurretEntitySelector;
 import icbm.sentry.turret.auto.TurretAntiAir;
 import icbm.sentry.turret.auto.TurretAutoBow;
 import icbm.sentry.turret.auto.TurretGun;
@@ -32,10 +32,10 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.oredict.ShapedOreRecipe;
-import calclavia.lib.network.PacketHandler;
-import calclavia.lib.prefab.damage.ObjectDamageSource;
-import calclavia.lib.prefab.terminal.CommandRegistry;
-import calclavia.lib.recipe.UniversalRecipe;
+import resonant.lib.network.PacketHandler;
+import resonant.lib.prefab.damage.ObjectDamageSource;
+import resonant.lib.prefab.terminal.CommandRegistry;
+import resonant.lib.recipe.UniversalRecipe;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -73,10 +73,13 @@ public class ICBMSentry
 
     public static final int ENTITY_ID_PREFIX = 50;
 
-    public static Block blockTurret, blockPlatform;
+    public static Block blockMunitionPrinter, blockConventionalModifier, blockTurret, blockPlatform, blockLaserGate;
 
     public static Item itemAmmo;
+    public static Item itemMagazine;
     public static Item itemUpgrade;
+    public static Item itemAssaultRifle, itemSniperRifle, itemShotgun;
+    public static Item itemConventionalAddon;
 
     /** ItemStack helpers. Do not modify theses. */
     public static ItemStack conventionalBullet, railgunBullet, antimatterBullet, bulletShell;
@@ -104,10 +107,9 @@ public class ICBMSentry
 
         TabICBM.itemStack = TurretRegistry.getItemStack(TurretAntiAir.class);
 
-        //TurretEntitySelector.configTurretTargeting(); //Removed as @Config
-
         proxy.preInit();
         CommandRegistry.register(new CMDAccessSettings(), "admin");
+        CommandRegistry.register(new CMDSentryTargetting(), "admin");
     }
 
     @EventHandler
@@ -119,6 +121,7 @@ public class ICBMSentry
     @EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
+
         // Shell
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(itemAmmo, 16, 0), new Object[] { "T", "T", 'T', "ingotTin" }));
         // Bullets
@@ -139,7 +142,7 @@ public class ICBMSentry
         // Laser Turret
         GameRegistry.addRecipe(new ShapedOreRecipe(TurretRegistry.getItemStack(TurretLaser.class), new Object[] { "DDG", "CS ", "GS ", 'D', UniversalRecipe.SECONDARY_PLATE.get(), 'S', UniversalRecipe.PRIMARY_PLATE.get(), 'C', UniversalRecipe.CIRCUIT_T3.get(), 'D', Item.diamond, 'G', Block.glass }));
         // Crossbox sentry
-        GameRegistry.addRecipe(new ShapedOreRecipe(TurretRegistry.getItemStack(TurretAutoBow.class), new Object[] { "BCL", "DW ", "WW ", 'D', Block.dispenser, 'B', Item.bow, 'C', UniversalRecipe.CIRCUIT_T1.get(), 'W', Block.planks}));
+        GameRegistry.addRecipe(new ShapedOreRecipe(TurretRegistry.getItemStack(TurretAutoBow.class), new Object[] { "BCL", "DW ", "WW ", 'D', Block.dispenser, 'B', Item.bow, 'C', UniversalRecipe.CIRCUIT_T1.get(), 'W', Block.planks }));
 
         // Upgrades
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(itemUpgrade, 1, Upgrades.RANGE.ordinal()), new Object[] { "B", "I", 'B', Item.bow, 'I', Item.diamond }));

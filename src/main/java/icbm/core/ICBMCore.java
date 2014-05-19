@@ -18,6 +18,7 @@ import icbm.core.compat.Waila;
 import icbm.core.entity.EntityFlyingBlock;
 import icbm.core.entity.EntityFragments;
 import icbm.core.items.ItemAntidote;
+import icbm.core.items.ItemComputer;
 import icbm.core.items.ItemPoisonPowder;
 import icbm.core.items.ItemSignalDisrupter;
 import icbm.core.items.ItemSulfurDust;
@@ -31,7 +32,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
@@ -39,19 +39,18 @@ import net.minecraftforge.oredict.ShapelessOreRecipe;
 import org.modstats.ModstatInfo;
 import org.modstats.Modstats;
 
-import calclavia.components.CalclaviaLoader;
-import calclavia.lib.config.ConfigAnnotationEvent;
-import calclavia.lib.config.ConfigHandler;
-import calclavia.lib.content.ContentRegistry;
-import calclavia.lib.modproxy.ProxyHandler;
-import calclavia.lib.network.PacketHandler;
-import calclavia.lib.network.PacketPlayerItem;
-import calclavia.lib.network.PacketTile;
-import calclavia.lib.prefab.item.ItemBlockMetadata;
-import calclavia.lib.prefab.ore.OreGenBase;
-import calclavia.lib.prefab.ore.OreGenerator;
-import calclavia.lib.recipe.UniversalRecipe;
-import calclavia.lib.utility.LanguageUtility;
+import resonant.core.ResonantEngine;
+import resonant.lib.config.ConfigHandler;
+import resonant.lib.content.ContentRegistry;
+import resonant.lib.modproxy.ProxyHandler;
+import resonant.lib.network.PacketHandler;
+import resonant.lib.network.PacketPlayerItem;
+import resonant.lib.network.PacketTile;
+import resonant.lib.prefab.item.ItemBlockMetadata;
+import resonant.lib.prefab.ore.OreGenBase;
+import resonant.lib.prefab.ore.OreGenerator;
+import resonant.lib.recipe.UniversalRecipe;
+import resonant.lib.utility.LanguageUtility;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -70,7 +69,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 /** Main class for ICBM core to run on. The core will need to be initialized by each ICBM module.
  * 
  * @author Calclavia */
-@Mod(modid = Reference.NAME, name = Reference.NAME, version = Reference.VERSION, dependencies = "after:AtomicScience;required-after:CalclaviaCore")
+@Mod(modid = Reference.NAME, name = Reference.NAME, version = Reference.VERSION, dependencies = "after:AtomicScience;required-after:ResonantEngine")
 @NetworkMod(channels = Reference.CHANNEL, clientSideRequired = true, serverSideRequired = false, packetHandler = PacketHandler.class)
 @ModstatInfo(prefix = "icbm", name = Reference.NAME, version = Reference.VERSION)
 public final class ICBMCore
@@ -91,6 +90,7 @@ public final class ICBMCore
     public static Item itemAntidote;
     public static Item itemSignalDisrupter;
     public static Item itemTracker;
+    public static Item itemHackingComputer;
 
     public static Block blockSulfurOre, blockRadioactive, blockCombatRail, blockBox;
 
@@ -122,7 +122,7 @@ public final class ICBMCore
 
         Settings.CONFIGURATION.load();
 
-        CalclaviaLoader.blockMulti.setTextureName(Reference.PREFIX + "machine");
+        ResonantEngine.blockMulti.setTextureName(Reference.PREFIX + "machine");
 
         // Blocks       
         blockSulfurOre = contentRegistry.createBlock(BlockSulfurOre.class);
@@ -142,6 +142,7 @@ public final class ICBMCore
         itemAntidote = contentRegistry.createItem(ItemAntidote.class);
         itemSignalDisrupter = contentRegistry.createItem(ItemSignalDisrupter.class);
         itemTracker = contentRegistry.createItem(ItemTracker.class);
+        itemHackingComputer = contentRegistry.createItem(ItemComputer.class);
 
         sulfurGenerator = new OreGeneratorICBM("Sulfur Ore", "oreSulfur", new ItemStack(blockSulfurOre), 0, 40, 20, 4).enable(Settings.CONFIGURATION);
 
@@ -198,7 +199,7 @@ public final class ICBMCore
         GameRegistry.addSmelting(Item.reed.itemID, new ItemStack(itemSulfurDust, 4, 1), 0f);
         GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(Item.gunpowder, 2), new Object[] { "dustSulfur", "dustSaltpeter", Item.coal }));
         GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(Item.gunpowder, 2), new Object[] { "dustSulfur", "dustSaltpeter", new ItemStack(Item.coal, 1, 1) }));
-        
+
         if (dustCharcoal != null && dustCharcoal.size() > 0)
             GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(Item.gunpowder, 2), new Object[] { "dustSulfur", "dustSaltpeter", "dustCharcoal" }));
         if (dustCoal != null && dustCoal.size() > 0)
@@ -249,15 +250,6 @@ public final class ICBMCore
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(blockReinforcedGlass, 8), new Object[] { "IGI", "GIG", "IGI", 'G', Block.glass, 'I', Item.ingotIron }));
 
         modproxies.postInit();
-    }
-
-    @ForgeSubscribe
-    public void configAnnotationAdded(ConfigAnnotationEvent event)
-    {
-        if (event.sourceClass.getName().startsWith(Settings.DOMAIN))
-        {
-            ConfigHandler.handleClass(event.sourceClass, Settings.CONFIGURATION);
-        }
     }
 
 }

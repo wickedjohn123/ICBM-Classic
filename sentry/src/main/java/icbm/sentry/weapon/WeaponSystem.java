@@ -1,4 +1,4 @@
-package icbm.sentry.turret.weapon;
+package icbm.sentry.weapon;
 
 import icbm.sentry.interfaces.ITurret;
 import icbm.sentry.interfaces.ITurretProvider;
@@ -10,15 +10,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
+import resonant.api.IExternalInventory;
+import resonant.api.weapon.IAmmunition;
+import resonant.api.weapon.ProjectileType;
+import resonant.lib.utility.inventory.InventoryUtility;
 import universalelectricity.api.vector.IRotation;
 import universalelectricity.api.vector.IVector3;
 import universalelectricity.api.vector.IVectorWorld;
 import universalelectricity.api.vector.Vector3;
 import universalelectricity.api.vector.VectorWorld;
-import calclavia.api.icbm.sentry.IAmmunition;
-import calclavia.api.icbm.sentry.ProjectileType;
-import calclavia.lib.utility.inventory.IExternalInventory;
-import calclavia.lib.utility.inventory.InventoryUtility;
 
 /** Modular system designed to handle all weapon related firing, and impact for an object. Requires
  * that it be constructed with a defined location. This location can be provided by using an entity,
@@ -35,7 +35,7 @@ public abstract class WeaponSystem implements IWeaponSystem, IVectorWorld, IRota
     //Properties
     protected float rayTraceLimit = 100;
     protected int itemsConsumedPerShot = 0;
-    protected Vector3 aimOffset = new Vector3();
+    public Vector3 aimOffset = new Vector3();
     protected IInventory inventory = null;
     public String soundEffect = null;
 
@@ -142,6 +142,12 @@ public abstract class WeaponSystem implements IWeaponSystem, IVectorWorld, IRota
     }
 
     @Override
+    public void fire(double range)
+    {
+        fire(new Vector3(x(), y(), z()).translate(turret().getWeaponOffset().scale(range)));
+    }
+
+    @Override
     public void fire(IVector3 target)
     {
         playFiringAudio();
@@ -172,11 +178,9 @@ public abstract class WeaponSystem implements IWeaponSystem, IVectorWorld, IRota
      * @author Based on MachineMuse */
     public void drawParticleStreamTo(World world, Vector3 start, IVector3 hit)
     {
-        Vector3 direction = new Vector3(start.toAngle(hit));
         double scale = 0.02;
         Vector3 currentPoint = start.clone();
         Vector3 difference = new Vector3(hit).difference(start);
-        double magnitude = difference.getMagnitude();
 
         while (currentPoint.distance(hit) > scale)
         {
@@ -346,9 +350,13 @@ public abstract class WeaponSystem implements IWeaponSystem, IVectorWorld, IRota
         {
             return (ITurret) object;
         }
-        if (object instanceof ITurretProvider)
+        else if (object instanceof ITurretProvider)
         {
             return ((ITurretProvider) object).getTurret();
+        }
+        else if (object instanceof Entity)
+        {
+            return new EntityTurret((Entity) object);
         }
         return null;
     }

@@ -1,17 +1,18 @@
 package icbm.sentry.platform.cmd;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import net.minecraft.entity.player.EntityPlayer;
-import calclavia.lib.access.AccessGroup;
-import calclavia.lib.access.AccessProfile;
-import calclavia.lib.access.AccessUser;
-import calclavia.lib.access.IProfileContainer;
-import calclavia.lib.access.Nodes;
-import calclavia.lib.prefab.terminal.ITerminal;
-import calclavia.lib.prefab.terminal.ITerminalCommand;
+import resonant.api.ITerminal;
+import resonant.api.ITerminalCommand;
+import resonant.lib.access.AccessGroup;
+import resonant.lib.access.AccessProfile;
+import resonant.lib.access.AccessUser;
+import resonant.lib.access.IProfileContainer;
+import resonant.lib.access.Nodes;
 
 /** Command used to modify the access profile of a tile
  * 
@@ -280,6 +281,11 @@ public class CMDAccessSettings implements ITerminalCommand
                 }
                 else if (command != null && command.equalsIgnoreCase("user"))
                 {
+                    if (args.length <= 2)
+                    {
+                        output_to_console.add("Access Level: " + profile.getUserAccess(player.username));
+                        return output_to_console;
+                    }
                     String user_sub_command = args[2];
                     if (user_sub_command.equalsIgnoreCase("list"))
                     {
@@ -413,7 +419,12 @@ public class CMDAccessSettings implements ITerminalCommand
     @Override
     public Set<String> getPermissionNodes()
     {
-        return null;
+        Set<String> nodes = new HashSet<String>();
+        nodes.add(this.getCommandName() + ".user");
+        nodes.add(this.getCommandName() + ".user.add");
+        nodes.add(this.getCommandName() + ".user.remove");
+        nodes.add(this.getCommandName() + ".user.list");
+        return nodes;
     }
 
     @Override
@@ -427,17 +438,20 @@ public class CMDAccessSettings implements ITerminalCommand
                 {
                     if (args[1] != null && args[1].equalsIgnoreCase("user"))
                     {
-                        if (args[2] != null && args[2].equalsIgnoreCase("add"))
+                        if (args.length >= 3)
                         {
-                            return Nodes.GROUP_ADD_USER;
-                        }
-                        if (args[2] != null && args[2].equalsIgnoreCase("remove"))
-                        {
-                            return Nodes.GROUP_REMOVE_USER;
-                        }
-                        if (args[2] != null && args[2].equalsIgnoreCase("list"))
-                        {
-                            return "group.user.list";
+                            if (args[2] != null && args[2].equalsIgnoreCase("add"))
+                            {
+                                return Nodes.GROUP_ADD_USER;
+                            }
+                            if (args[2] != null && args[2].equalsIgnoreCase("remove"))
+                            {
+                                return Nodes.GROUP_REMOVE_USER;
+                            }
+                            if (args[2] != null && args[2].equalsIgnoreCase("list"))
+                            {
+                                return "group.user.list";
+                            }
                         }
                     }
                 }

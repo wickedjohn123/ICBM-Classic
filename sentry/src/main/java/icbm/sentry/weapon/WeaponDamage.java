@@ -1,4 +1,4 @@
-package icbm.sentry.turret.weapon;
+package icbm.sentry.weapon;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
@@ -40,6 +40,7 @@ public class WeaponDamage extends WeaponRaytrace
     {
         if (entity != null)
         {
+        	System.out.println("Entity: " + entity + " suffered " + damage + " damage!");
             entity.attackEntityFrom(damageSource, damage);
         }
     }
@@ -48,6 +49,5 @@ public class WeaponDamage extends WeaponRaytrace
     protected void onHitBlock(Vector3 block)
     {
         // TODO Add a way for basic rounds to bounce off or terrain based on material type
-
     }
 }

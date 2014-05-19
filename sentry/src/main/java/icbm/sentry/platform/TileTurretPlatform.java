@@ -1,13 +1,16 @@
 package icbm.sentry.platform;
 
+import icbm.sentry.interfaces.IWeaponProvider;
 import icbm.sentry.turret.block.TileTurret;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
+import resonant.lib.prefab.tile.TileElectricalInventory;
+import resonant.lib.utility.MathUtility;
 import universalelectricity.api.CompatibilityModule;
 import universalelectricity.api.energy.EnergyStorageHandler;
 import universalelectricity.api.energy.IEnergyContainer;
 import universalelectricity.api.vector.Vector3;
-import calclavia.lib.prefab.tile.TileElectricalInventory;
 
 /** Turret Platform
  * 
@@ -15,6 +18,8 @@ import calclavia.lib.prefab.tile.TileElectricalInventory;
 public class TileTurretPlatform extends TileElectricalInventory
 {
     private TileTurret[] turrets = new TileTurret[6];
+
+    private static int[] ammoBaySlots = MathUtility.generateSqeuncedArray(0, 12);
 
     public TileTurretPlatform()
     {
@@ -84,22 +89,52 @@ public class TileTurretPlatform extends TileElectricalInventory
         return used;
     }
 
-	@Override
-	public EnergyStorageHandler getEnergyHandler()
-	{
-		for (TileTurret turretTile : turrets)
-		{
-			if (turretTile != null && turretTile.getTurret() != null && turretTile.getTurret() instanceof IEnergyContainer)
-			{
-				return turretTile.getTurret().battery;
-			}
-		}
-		return super.getEnergyHandler();
-	}
+    @Override
+    public EnergyStorageHandler getEnergyHandler()
+    {
+        for (TileTurret turretTile : turrets)
+        {
+            if (turretTile != null && turretTile.getTurret() != null && turretTile.getTurret() instanceof IEnergyContainer)
+            {
+                return turretTile.getTurret().battery;
+            }
+        }
+        return super.getEnergyHandler();
+    }
 
-	@Override
+    @Override
     public long onExtractEnergy(ForgeDirection from, long extract, boolean doExtract)
     {
         return 0;
+    }
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(int side)
+    {
+        return ammoBaySlots;
+    }
+
+    @Override
+    public boolean canStore(ItemStack stack, int slot, ForgeDirection side)
+    {
+        if (stack != null)
+        {
+            if (CompatibilityModule.isHandler(stack.getItem()))
+            {
+                return true;
+            }
+            for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS)
+            {
+                TileTurret tileTurret = getTurret(direction);
+                if (tileTurret != null && tileTurret.getTurret() instanceof IWeaponProvider)
+                {
+                    if (((IWeaponProvider) tileTurret.getTurret()).getWeaponSystem() != null)
+                    {
+                        return ((IWeaponProvider) tileTurret.getTurret()).getWeaponSystem().isAmmo(stack);
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

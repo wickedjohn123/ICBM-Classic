@@ -1,4 +1,4 @@
-package icbm.sentry.turret.weapon;
+package icbm.sentry.weapon;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
@@ -39,10 +39,12 @@ public abstract class WeaponRaytrace extends WeaponSystem
             if (endTarget.typeOfHit == EnumMovingObjectType.ENTITY)
             {
                 onHitEntity(endTarget.entityHit);
+                //System.out.println("WeaponRay: Entity-> " + endTarget.entityHit);
             }
             else if (endTarget.typeOfHit == EnumMovingObjectType.TILE)
             {
                 onHitBlock(new Vector3(endTarget.hitVec));
+                //System.out.println("WeaponRay: Tile-> " + endTarget.hitVec);
             }
         }
     }

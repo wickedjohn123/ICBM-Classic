@@ -17,16 +17,17 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
+import resonant.api.IExternalInventory;
+import resonant.api.IExternalInventoryBox;
+import resonant.api.IRotatable;
+import resonant.lib.access.AccessProfile;
+import resonant.lib.access.AccessUser;
+import resonant.lib.access.IProfileContainer;
+import resonant.lib.multiblock.IBlockActivate;
+import resonant.lib.network.PacketHandler;
+import resonant.lib.prefab.terminal.TileTerminal;
 import universalelectricity.api.vector.IVector3;
 import universalelectricity.api.vector.Vector3;
-import calclavia.lib.access.AccessProfile;
-import calclavia.lib.access.IProfileContainer;
-import calclavia.lib.multiblock.fake.IBlockActivate;
-import calclavia.lib.network.PacketHandler;
-import calclavia.lib.prefab.terminal.TileTerminal;
-import calclavia.lib.prefab.tile.IRotatable;
-import calclavia.lib.utility.inventory.IExternalInventory;
-import calclavia.lib.utility.inventory.IExternalInventoryBox;
 
 import com.google.common.io.ByteArrayDataInput;
 
@@ -237,6 +238,7 @@ public class TileTurret extends TileTerminal implements IProfileContainer, IRota
     public void writeToNBT(NBTTagCompound nbt)
     {
         super.writeToNBT(nbt);
+
         NBTTagCompound perm_tag = new NBTTagCompound();
         this.getAccessProfile().save(perm_tag);
         nbt.setCompoundTag("permissions", perm_tag);
@@ -256,6 +258,7 @@ public class TileTurret extends TileTerminal implements IProfileContainer, IRota
     public void readFromNBT(NBTTagCompound nbt)
     {
         super.readFromNBT(nbt);
+
         this.unlocalizedName = nbt.getString("unlocalizedName");
         if (nbt.hasKey("permissions"))
             this.setAccessProfile(new AccessProfile((nbt.getCompoundTag("permissions"))));
@@ -413,7 +416,14 @@ public class TileTurret extends TileTerminal implements IProfileContainer, IRota
     @Override
     public boolean canUse(String node, EntityPlayer player)
     {
-		return this.getAccessProfile().getUserAccess(player.username).hasNode(node);
+        AccessUser user = this.getAccessProfile().getUserAccess(player.username);
+        assert user != null : "TileTurret canUse() user returned null for player " + player.username;
+        
+        if (user != null && user.getGroup() != null)
+        {
+            return this.getAccessProfile().getUserAccess(player.username).hasNode(node);
+        }
+        return false;
     }
 
     @Override
@@ -430,5 +440,4 @@ public class TileTurret extends TileTerminal implements IProfileContainer, IRota
         //TODO: change this based on model size
         return AxisAlignedBB.getAABBPool().getAABB(xCoord - 1, yCoord, zCoord - 1, xCoord + 2, yCoord + 2, zCoord + 2);
     }
-
 }
