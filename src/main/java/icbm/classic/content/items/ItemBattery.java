@@ -4,6 +4,7 @@ import icbm.classic.config.ConfigBattery;
 import icbm.classic.lib.energy.storage.EnergyBufferLimited;
 import icbm.classic.prefab.item.ItemICBMBase;
 import icbm.classic.prefab.item.ItemStackCapProvider;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -16,6 +17,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.List;
+
+import static icbm.classic.config.ConfigBattery.BATTERY_INPUT_LIMIT;
+import static icbm.classic.config.ConfigBattery.BATTERY_OUTPUT_LIMIT;
 
 /**
  * Simple battery to move energy around between devices
@@ -37,7 +41,7 @@ public class ItemBattery extends ItemICBMBase
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt)
     {
         ItemStackCapProvider provider = new ItemStackCapProvider(stack);
-        provider.add("battery", CapabilityEnergy.ENERGY, new EnergyBufferLimited(ConfigBattery.BATTERY_CAPACITY, ConfigBattery.BATTERY_INPUT_LIMIT, ConfigBattery.BATTERY_OUTPUT_LIMIT));
+        provider.add("battery", CapabilityEnergy.ENERGY, new EnergyBufferLimited(ConfigBattery.BATTERY_CAPACITY, BATTERY_INPUT_LIMIT, BATTERY_OUTPUT_LIMIT));
         return provider;
     }
 
@@ -48,15 +52,27 @@ public class ItemBattery extends ItemICBMBase
         if (stack.hasCapability(CapabilityEnergy.ENERGY, null))
         {
             IEnergyStorage energyStorage = stack.getCapability(CapabilityEnergy.ENERGY, null);
+
+
             if (energyStorage != null)
             {
                 double p = getDurabilityForDisplay(stack) * 100;
                 list.add("L: " + (int) p + "%");
                 list.add("E: " + energyStorage.getEnergyStored() + "/" + energyStorage.getMaxEnergyStored() + " FE");
             }
+
+            if(GuiScreen.isShiftKeyDown()){
+
+                list.add("max Input: " + BATTERY_INPUT_LIMIT + " fe");
+                list.add("max output: " + BATTERY_OUTPUT_LIMIT + " fe");
+
+            }
         }
-        //TODO add info
-        //TODO add shift info (input & output limits)
+
+        //TODO add info. not sure what counts as info
+        //TODO add shift info (input & output limits). finished line 66 to 67
+
+
     }
 
     @Override
